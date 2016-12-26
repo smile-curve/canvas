@@ -47,21 +47,21 @@ shape.prototype={
 			}
 		}
 	},
-	line:function(x,y,x1,y1){
+	line:function(x,y,x1,y1){   //线
 		this.cobj.moveTo(x,y);
 		this.cobj.lineTo(x1,y1);
 		this.cobj.stroke();
 	},
-	rect:function(x,y,x1,y1){
+	rect:function(x,y,x1,y1){  //矩形
 		this.cobj.rect(x,y,x1-x,y1-y);
 		this.cobj[this.style]();
 	},
-	arc:function(x,y,x1,y1){
+	arc:function(x,y,x1,y1){   //圆形
 		var r=Math.sqrt((x1-x)*(x1-x)+(y1-y)*(y1-y));
 		this.cobj.arc(x,y,r,0,2*Math.PI);
 		this.cobj[this.style]();
 	},
-	bian:function(x,y,x1,y1){
+	bian:function(x,y,x1,y1){   //多边形
 		var angle=360/this.bianNum*Math.PI/180;   //每条边对应的弧度
 		var r=Math.sqrt((x1-x)*(x1-x)+(y1-y)*(y1-y));   //半径
 		for(var i=0;i<this.bianNum;i++){       
@@ -70,7 +70,7 @@ shape.prototype={
 		this.cobj.closePath();
 		this.cobj[this.style]();
 	},
-	jiao:function(x,y,x1,y1){
+	jiao:function(x,y,x1,y1){  //多角形
 		var angle=360/(this.bianNum*2)*Math.PI/180;   //每条边对应的弧度
 		var r=Math.sqrt((x1-x)*(x1-x)+(y1-y)*(y1-y));   //半径
 		var r1=r/1.5;
@@ -84,7 +84,7 @@ shape.prototype={
 		this.cobj.closePath();
 		this.cobj[this.style]();
 	},
-	pen:function(){
+	pen:function(){   //钢笔
 		var that=this;
 		this.copy.onmousedown=function(e){
 			var startx=e.offsetX;
@@ -110,7 +110,7 @@ shape.prototype={
 			}
 		}
 	},
-	xp:function(xpObj){
+	xp:function(xpObj){  //橡皮擦
 		var that=this;
 		that.copy.onmousemove=function(e){
 			if(!that.isshowxp){
@@ -155,6 +155,71 @@ shape.prototype={
 					that.history.push(that.cobj.getImageData(0,0,that.width,that.height));
 				}
 			}
-		}
-	}
+		}  
+	},
+    msk:function(dataobj,num,x,y){//马赛克    	
+        var width=dataobj.width,height=dataobj.height;
+        var num=num;
+        var w=width/num;
+        var h=height/num;
+        for(var i=0;i<num;i++){ //行
+            for(var j=0;j<num;j++){  //列---x
+                var dataobj=this.cobj.getImageData(j*w,i*h,w,h);
+
+                var r=0,g=0,b=0;
+                for(var k=0;k<dataobj.width*dataobj.height;k++){
+                    r+=dataobj.data[k*4+0];
+                    g+=dataobj.data[k*4+1];
+                    b+=dataobj.data[k*4+2];
+                }
+
+                r=parseInt(r/(dataobj.width*dataobj.height));
+                g=parseInt(g/(dataobj.width*dataobj.height));
+                b=parseInt(b/(dataobj.width*dataobj.height));
+
+                for(var k=0;k<dataobj.width*dataobj.height;k++){
+                    dataobj.data[k*4+0]=r;
+                    dataobj.data[k*4+1]=g;
+                    dataobj.data[k*4+2]=b;
+                }
+                this.cobj.putImageData(dataobj,x+j*w,y+i*h);
+            }
+        }
+    },
+    fx:function(dataobj,x,y){//反向
+        for(var i=0;i<dataobj.width*dataobj.height;i++){    //rgba
+            dataobj.data[i*4]=255-dataobj.data[i*4];
+            dataobj.data[i*4+1]=255-dataobj.data[i*4+1];
+            dataobj.data[i*4+2]=255-dataobj.data[i*4+2];
+            dataobj.data[i*4+3]=255;
+        }
+        this.cobj.putImageData(dataobj,x,y);
+    },
+	mh:function(dataobj,num,x,y){ //高斯模糊
+        var width = dataobj.width, height = dataobj.height;
+        var arr=[];
+        var num = num;
+        for (var i = 0; i < height; i++) {//行
+            for (var j = 0; j < width; j++) {//列  x
+                var x1=j+num>width?j-num:j;
+                var y1=i+num>height?i-num:i;
+                var dataObj = this.cobj.getImageData(x1, y1,num, num);
+                var r = 0, g = 0, b = 0;
+                for (var k = 0; k < dataObj.width * dataObj.height; k++) {
+                    r += dataObj.data[k * 4 + 0];
+                    g += dataObj.data[k * 4 + 1];
+                    b += dataObj.data[k * 4 + 2];
+                }
+                r = parseInt(r / (dataObj.width * dataObj.height));
+                g = parseInt(g / (dataObj.width * dataObj.height));
+                b = parseInt(b / (dataObj.width * dataObj.height));
+                arr.push(r,g,b,255);
+            }
+        }
+        for(var i=0;i<dataobj.data.length;i++){
+            dataobj.data[i]=arr[i]
+        }
+        this.cobj.putImageData(dataobj,x,y);
+    }
+
 }

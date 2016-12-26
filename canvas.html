@@ -141,107 +141,30 @@
 				})
 			})
 			
-			/*//图片样式
-			var img=$("img");
-
-			// cobj.drawImage(img,0,0,200,200); //在画布上定位图像
-			var dataobj=cobj.getImageData(0,0,200,200);
-			//马赛克
-			function msk(dataobj,num,x,y){
-				var width=dataobj.width,height=dataobj.height;
-				var num=num;
-				var w=width/num;  //每个马赛克的宽高
-				var h=height/num;
-				for (var i = 0; i < num; i++) {  //行
-					for(var j=0; j< num; j++) {  //列
-						var dataobj=cobj.getImageData(j*w,i*h,w,h);
-						var r=0,g=0,b=0;   //
-						for (var k = 0; k < dataobj.width*dataobj.height; k++) {  //取值
-							r+=dataobj.data[k*4+0];
-							g+=dataobj.data[k*4+1];
-							b+=dataobj.data[k*4+2];
-						};
-						r=parseInt(r/(dataobj.width*dataobj.height));
-						g=parseInt(g/(dataobj.width*dataobj.height));
-						b=parseInt(b/(dataobj.width*dataobj.height));
-						for (var k = 0; k < dataobj.width*dataobj.height; k++) {   //赋值
-							dataobj.data[k*4+0]=r;
-							dataobj.data[k*4+1]=g;
-							dataobj.data[k*4+2]=b;
-						};
-						cobj.putImageData(dataobj,x+j*w,y+i*h);
-					}
-					
-				};
-			}
-			//反向
-			function fx(dataobj,x,y){
-				for (var i = 0; i < dataobj.width*dataobj.height; i++) {
-					dataobj.data[i*4+0]=255-dataobj.data[i*4+0];  //r
-					dataobj.data[i*4+1]=255-dataobj.data[i*4+1];  //g
-					dataobj.data[i*4+2]=255-dataobj.data[i*4+2];  //b
-					dataobj.data[i*4+3]=255;   //a
-				};
-				cobj.putImageData(dataobj,x,y);    //将获取的图像放到指定区间
-			}
-
-			//高斯模糊
-			function blur(dataobj,num,x,y){
-				var width=dataobj.width,height=dataobj.height;
-				var arr=[];
-				var num=num;
-				for (var i = 0; i < height; i++) {  //行
-					for(var j=0; j< width; j++) {  //列
-						var x1=j+num>width?j-num:j;
-						var y1=i+num>height?i-num:i;
-						var dataObj=cobj.getImageData(x1,y1,num,num);
-						var r=0,g=0,b=0;   //
-						for (var k = 0; k < dataObj.width*dataObj.height; k++) {  //取值
-							r+=dataObj.data[k*4+0];
-							g+=dataObj.data[k*4+1];
-							b+=dataObj.data[k*4+2];
-						};
-						r=parseInt(r/(dataObj.width*dataObj.height));
-						g=parseInt(g/(dataObj.width*dataObj.height));
-						b=parseInt(b/(dataObj.width*dataObj.height));
-						arr.push(r,g,b,255);					
-					}
-					
-				};
-				for (var i = 0; i < dataobj.data.length; i++) {
-					dataobj.data[i]=arr[i];
-				};
-				cobj.putImageData(dataobj,x,y);
-			}
-
-			
-			//选择文件
-			// var file=document.querySelector("input");
-			// var img=document.querySelector("img");
-			$("file").onchange=function(){
-				var fileobj=this.files[0];
-				var reader=new FileReader();  //读取文件
-				reader.readAsDataURL(fileobj);   //将文件读取为URL地址格式
-				reader.onload=function(e){
-					img.src=e.target.result;
-					cobj.drawImage(img,0,0,canvas.width,canvas.height); 
-					dataobj=cobj.getImageData(0,0,canvas.width,canvas.height);
-				}
-			}
-			//选择
-			var lis=$(".aside-menu-list:eq(6) li");
-			for (var i = 0; i < lis.length; i++) {
-				lis.onclick=function(){
-					var attr=this.getAttribute("data-role");
-					if(attr=="blur"){   //
-						blur(dataobj,5,0,0);
-					}else if(attr=="fx"){  //
-						fx(dataobj,0,0);
-					}else if(attr=="msk"){   //
-						msk(dataobj,50,0,0);
-					}
-				}
-			};*/
+			//图片样式
+			var file=document.querySelector("input[type='file']");
+	        var img=document.querySelector("img");
+	        file.onchange=function(){
+	            var fileObj=this.files[0];
+	            var reader=new FileReader();
+	            reader.readAsDataURL(fileObj);
+	            reader.onload=function(e){
+	                img.src= e.target.result;
+	                cobj.drawImage(img,0,0,canvas.width,canvas.height);
+	                dataobj=cobj.getImageData(0,0,canvas.width,canvas.height);
+	            }
+	        }
+	        $(".aside-menu-list:eq(6) li").click(function(){
+	            var index=$(this).index(".aside-menu-list:eq(6) li");
+	            if(index==0){
+	                drawObj.msk(dataobj,50,0,0);
+	            }else if(index==1){
+	                drawObj.fx(dataobj,0,0);
+	            }else if(index==2){
+	                drawObj.mh(dataobj,5,0,0);
+	            }
+	        })
+		
 		}
 	</script>
 </head>
